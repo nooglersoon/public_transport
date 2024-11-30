@@ -7,8 +7,14 @@ func routes(_ app: Application) throws {
     app.group("stations") { stations in
         /// [GET] /stations
         /// Return the list of stations
-        stations.get { request -> [StationResponse] in
-            return []
+        stations.get { request -> [Station] in
+            
+            let db = request.db
+            let stations = try await Station.query(on: db).all()
+            
+            print(stations)
+            
+            return stations
         }
         
         /// [POST] /stations
