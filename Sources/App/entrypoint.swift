@@ -9,6 +9,16 @@ enum Entrypoint {
         var env = try Environment.detect()
         try LoggingSystem.bootstrap(from: &env)
         
+        let corsConfiguration = CORSMiddleware.Configuration(
+            allowedOrigin: .all,
+            allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
+        )
+        
+        let cors = CORSMiddleware(configuration: corsConfiguration)
+        // cors middleware should come before default error middleware using `at: .beginning`
+        
+        
         let app = try await Application.make(env)
 
         // This attempts to install NIO as the Swift Concurrency global executor.
