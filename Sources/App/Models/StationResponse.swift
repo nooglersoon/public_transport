@@ -9,18 +9,19 @@ import Foundation
 import Vapor
 import Fluent
 
+// DTO
 public struct StationResponse: Content {
-    public let id: UUID
+    public let id: Int
     public let name: String
     public let corridor: String
     public let transportType: String
     public let latitude: Double
     public let longitude: Double
     public let retails: [String]
-    public let coworkingSpaces: [String]
-    public let stays: [String]
-    public let amenities: [String]
-    public let intermodalTransports: [String]
+//    public let coworkingSpaces: [String]
+//    public let stays: [String]
+//    public let amenities: [String]
+//    public let intermodalTransports: [String]
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -30,15 +31,15 @@ public struct StationResponse: Content {
         case latitude
         case longitude
         case retails
-        case coworkingSpaces = "coworking_spaces"
-        case stays
-        case amenities
-        case intermodalTransports = "intermodal_transports"
+//        case coworkingSpaces = "coworking_spaces"
+//        case stays
+//        case amenities
+//        case intermodalTransports = "intermodal_transports"
     }
     
 }
 
-public final class Station: Model, Content {
+public final class Station: Model {
     
     public static let schema: String = "stations"
     
@@ -61,9 +62,9 @@ public final class Station: Model, Content {
     @Field(key: "retails")
     var retails: [String]
     
-//    // Reference to the Galaxy this Star is in.
-//    @Parent(key: "transport_type_id")
-//    var transportType: TransportType
+    //    // Reference to the Galaxy this Star is in.
+    //    @Parent(key: "transport_type_id")
+    //    var transportType: TransportType
     
     public init() { }
     
@@ -74,7 +75,7 @@ public final class Station: Model, Content {
         latitude: Double,
         longitude: Double,
         retails: [String]
-//        transportTypeID: UUID
+        //        transportTypeID: UUID
     ) {
         self.id = id
         self.name = name
@@ -82,29 +83,28 @@ public final class Station: Model, Content {
         self.latitude = latitude
         self.longitude = longitude
         self.retails = retails
-//        self.$transportType.id = transportTypeID
+        //        self.$transportType.id = transportTypeID
     }
     
 }
 
 // MARK: - Station Migration
 public struct CreateStation: AsyncMigration {
-    // Prepares the database for storing Galaxy models.
-        public func prepare(on database: Database) async throws {
-            try await database.schema("stations")
-                .id()
-                .field("name", .string, .required)
-                .field("corridor", .string, .required)
-                .field("latitude", .double, .required)
-                .field("longitude", .double, .required)
-                .field("retails", .array(of: .string), .required)
-                .create()
-        }
-
-        // Optionally reverts the changes made in the prepare method.
-        public func revert(on database: Database) async throws {
-            try await database.schema("stations").delete()
-        }
+    public func prepare(on database: Database) async throws {
+        try await database.schema("stations")
+            .id()
+            .field("name", .string, .required)
+            .field("corridor", .string, .required)
+            .field("latitude", .double, .required)
+            .field("longitude", .double, .required)
+            .field("retails", .array(of: .string), .required)
+            .create()
+    }
+    
+    // Optionally reverts the changes made in the prepare method.
+    public func revert(on database: Database) async throws {
+        try await database.schema("stations").delete()
+    }
 }
 
 public final class TransportType: Model {
@@ -122,6 +122,23 @@ public final class TransportType: Model {
     public init(id: UUID? = nil, name: String) {
         self.id = id
         self.name = name
+    }
+    
+}
+
+
+public extension Station {
+    
+    func mapToStationResponse() -> StationResponse {
+        .init(
+            id: id ?? 0,
+            name: name,
+            corridor: corridor,
+            transportType: "MRT",
+            latitude: latitude,
+            longitude: longitude,
+            retails: retails
+        )
     }
     
 }

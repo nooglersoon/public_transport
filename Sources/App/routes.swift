@@ -7,8 +7,9 @@ func routes(_ app: Application) throws {
     app.group("stations") { stations in
         /// [GET] /stations
         /// Return the list of stations
-        stations.get { request -> [Station] in
-            let stations = try await Station.query(on: request.db).all()
+        stations.get { request -> [StationResponse] in
+            let queriedStations = try await Station.query(on: request.db).all()
+            let stations: [StationResponse] =  queriedStations.map({$0.mapToStationResponse()})
             return stations
         }
         
