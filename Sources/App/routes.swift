@@ -2,17 +2,9 @@ import Foundation
 import Vapor
 
 func routes(_ app: Application) throws {
-    
+        
     /// Public Stations
     app.group("stations") { stations in
-        /// [GET] /stations
-        /// Return the list of stations
-        stations.get { request -> [StationResponse] in
-            let queriedStations = try await Station.query(on: request.db).all()
-            let stations: [StationResponse] =  queriedStations.map({$0.mapToStationResponse()})
-            return stations
-        }
-        
         /// [POST] /stations
         /// Add a new station
         stations.post { request -> String in
@@ -55,4 +47,7 @@ func routes(_ app: Application) throws {
             }
         }
     }
+    
+    try app.register(collection: StationsController())
+    
 }
