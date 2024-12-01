@@ -5,11 +5,6 @@ func routes(_ app: Application) throws {
         
     /// Public Stations
     app.group("stations") { stations in
-        /// [POST] /stations
-        /// Add a new station
-        stations.post { request -> String in
-            return "ok"
-        }
         
         stations.group(":id") { station in
             

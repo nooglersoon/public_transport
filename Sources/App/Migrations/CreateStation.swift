@@ -16,7 +16,7 @@ public struct CreateStation: AsyncMigration {
             .field("corridor", .string, .required)
             .field("latitude", .double, .required)
             .field("longitude", .double, .required)
-            .field("retails", .array(of: .string), .required)
+            .field("retails", .array(of: .string))
             .create()
     }
     

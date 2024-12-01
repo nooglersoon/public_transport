@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import Vapor
 
-public struct StationRequest: Codable {
+public struct StationRequest: Content {
     public let id: Int
     public let name: String
     public let corridor: String
@@ -32,6 +33,19 @@ public struct StationRequest: Codable {
         //        case stays
         //        case amenities
         //        case intermodalTransports = "intermodal_transports"
+    }
+    
+}
+
+// MARK: - Validation
+
+extension StationRequest: Validatable {
+    
+    public static func validations(_ validations: inout Validations) {
+        validations.add("name", as: String.self, is: !.empty)
+        validations.add("corridor", as: String.self, is: !.empty)
+        validations.add("latitude", as: Double.self)
+        validations.add("longitude", as: Double.self)
     }
     
 }
