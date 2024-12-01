@@ -58,6 +58,9 @@ public final class Station: Model, Content {
     @Field(key: "longitude")
     var longitude: Double
     
+    @Field(key: "retails")
+    var retails: [String]
+    
 //    // Reference to the Galaxy this Star is in.
 //    @Parent(key: "transport_type_id")
 //    var transportType: TransportType
@@ -69,7 +72,8 @@ public final class Station: Model, Content {
         name: String,
         corridor: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        retails: [String]
 //        transportTypeID: UUID
     ) {
         self.id = id
@@ -77,6 +81,7 @@ public final class Station: Model, Content {
         self.corridor = corridor
         self.latitude = latitude
         self.longitude = longitude
+        self.retails = retails
 //        self.$transportType.id = transportTypeID
     }
     
@@ -88,10 +93,11 @@ public struct CreateStation: AsyncMigration {
         public func prepare(on database: Database) async throws {
             try await database.schema("stations")
                 .id()
-                .field("name", .string)
-                .field("corridor", .string)
-                .field("latitude", .double)
-                .field("longitude", .double)
+                .field("name", .string, .required)
+                .field("corridor", .string, .required)
+                .field("latitude", .double, .required)
+                .field("longitude", .double, .required)
+                .field("retails", .array(of: .string), .required)
                 .create()
         }
 
