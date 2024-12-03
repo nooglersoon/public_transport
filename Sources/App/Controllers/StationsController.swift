@@ -23,7 +23,11 @@ struct StationsController: RouteCollection {
         todos.post(use: createNewStation)
         
         todos.group(":id") { todo in
-//            todo.get(use: show)
+            
+            /// [GET] /stations/:id
+            /// Return the station with the given id
+            todo.get(use: getStation)
+            
 //            todo.put(use: update)
 //            todo.delete(use: delete)
         }
@@ -37,7 +41,7 @@ extension StationsController {
     @Sendable
     func getAllStations(_ request: Request) async throws -> [StationResponse] {
         let queriedStations = try await Station.query(on: request.db).all()
-        let stations: [StationResponse] =  queriedStations.map({$0.mapToStationResponse()})
+        let stations: [StationResponse] =  queriedStations.map({$0.response})
         return stations
     }
     
@@ -51,9 +55,20 @@ extension StationsController {
             guard let station = try await Station.find(newStation.id, on: request.db) else {
                 throw Abort(.internalServerError, reason: "Failed to create new station")
             }
-            return station.mapToStationResponse()
+            return station.response
         } catch {
             throw Abort(.internalServerError, reason: "Failed to create new station")
         }
+    }
+    
+    @Sendable
+    func getStation(_ request: Request) async throws -> StationResponse {
+        guard let stationId = request.parameters.get("id", as: Int.self) else {
+            throw Abort(.badRequest, reason: "Station id is not provided or invalid")
+        }
+        guard let station = try await Station.find(stationId, on: request.db) else {
+            throw Abort(.notFound, reason: "Station is not found")
+        }
+        return station.response
     }
 }

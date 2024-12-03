@@ -6,7 +6,6 @@ import FluentSQLiteDriver
 public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
-    // register routes
     
     // configure databases
     // Get the absolute path for db.sqlite
@@ -19,5 +18,6 @@ public func configure(_ app: Application) async throws {
     // auto migrate
     try await app.autoMigrate()
     
+    // register routes
     try routes(app)
 }

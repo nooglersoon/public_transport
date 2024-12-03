@@ -59,8 +59,7 @@ public final class Station: Model {
 // MARK: - Map to DTO
 
 public extension Station {
-    
-    func mapToStationResponse() -> StationResponse {
+    var response: StationResponse {
         .init(
             id: id ?? 0,
             name: name,
@@ -71,5 +70,4 @@ public extension Station {
             retails: retails
         )
     }
-    
 }

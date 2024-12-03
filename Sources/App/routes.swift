@@ -8,17 +8,6 @@ func routes(_ app: Application) throws {
         
         stations.group(":id") { station in
             
-            /// [GET] /stations/:id
-            /// Return specific station details
-            station.get { request -> StationResponse in
-                
-                guard let id = request.parameters.get("id") else {
-                    throw Abort(.badRequest, reason: "Missing station id")
-                }
-                let station = try request.content.decode(StationResponse.self)
-                return station
-            }
-            
             /// [PUT] /stations/:id
             /// Edit a station's details
             station.put { request -> String in
