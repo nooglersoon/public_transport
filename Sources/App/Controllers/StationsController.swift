@@ -38,14 +38,14 @@ struct StationsController: RouteCollection {
 // MARK: - Extensions
 extension StationsController {
     @Sendable
-    func getAllStations(_ request: Request) async throws -> [StationResponse] {
+    func getAllStations(_ request: Request) async throws -> GenericResponse<[StationResponse]> {
         let queriedStations = try await Station.query(on: request.db).all()
         let stations: [StationResponse] =  queriedStations.map({$0.response})
-        return stations
+        return .init(data: stations, status: 200, message: "Success")
     }
     
     @Sendable
-    func createNewStation(_ request: Request) async throws -> StationResponse {
+    func createNewStation(_ request: Request) async throws -> GenericResponse<StationResponse> {
         try StationRequest.validate(content: request)
         let newStation = try request.content.decode(StationRequest.self)
         let station = Station(id: newStation.id, name: newStation.name, corridor: newStation.corridor, latitude: newStation.latitude, longitude: newStation.longitude, retails: [])
@@ -54,21 +54,21 @@ extension StationsController {
             guard let station = try await Station.find(newStation.id, on: request.db) else {
                 throw Abort(.internalServerError, reason: "Failed to create new station")
             }
-            return station.response
+            return .init(data: station.response, status: 200, message: "Success")
         } catch {
             throw Abort(.internalServerError, reason: "Failed to create new station")
         }
     }
     
     @Sendable
-    func getStation(_ request: Request) async throws -> StationResponse {
+    func getStation(_ request: Request) async throws -> GenericResponse<StationResponse> {
         guard let stationId = request.parameters.get("id", as: Int.self) else {
             throw Abort(.badRequest, reason: "Station id is not provided or invalid")
         }
         guard let station = try await Station.find(stationId, on: request.db) else {
             throw Abort(.notFound, reason: "Station is not found")
         }
-        return station.response
+        return .init(data: station.response, status: 200, message: "Success")
     }
     
     @Sendable
@@ -83,7 +83,7 @@ extension StationsController {
         
         do {
             try await station.delete(on: request.db)
-            return .init(data: nil, status: 200, message: "Delete Station Success")
+            return .init(data: nil, status: 200, message: "Success")
         } catch {
             throw Abort(.internalServerError, reason: "Failed to Delete Station")
         }
