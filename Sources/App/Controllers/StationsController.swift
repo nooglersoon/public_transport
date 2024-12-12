@@ -27,9 +27,8 @@ struct StationsController: RouteCollection {
             /// [GET] /stations/:id
             /// Return the station with the given id
             todo.get(use: getStation)
-            
 //            todo.put(use: update)
-//            todo.delete(use: delete)
+            todo.delete(use: deleteStation)
         }
         
     }
@@ -70,5 +69,23 @@ extension StationsController {
             throw Abort(.notFound, reason: "Station is not found")
         }
         return station.response
+    }
+    
+    @Sendable
+    func deleteStation(_ request: Request) async throws -> GenericResponse<EmptyResponse> {
+        guard let stationId = request.parameters.get("id", as: Int.self) else {
+            throw Abort(.badRequest, reason: "Station id is not provided or invalid")
+        }
+        
+        guard let station = try await Station.find(stationId, on: request.db) else {
+            throw Abort(.notFound, reason: "Station is not found")
+        }
+        
+        do {
+            try await station.delete(on: request.db)
+            return .init(data: nil, status: 200, message: "Delete Station Success")
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to Delete Station")
+        }
     }
 }
